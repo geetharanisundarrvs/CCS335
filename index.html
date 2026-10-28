@@ -3,202 +3,908 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RVSCE-IT Learning Portal</title>
-    <!-- Tailwind CSS -->
+    <title>CCS335 Cloud Computing Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        :root {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f1f5f9;
+            --text-main: #1f2937;
+            --text-secondary: #475569;
+            --border-light: #e2e8f0;
+            --diagram-bg: #ffffff;
+            --diagram-border: #818cf8;
+            --diagram-text: #3730a3;
+            --chat-bg: #ffffff;
+            --chat-bubble-bg: #f8fafc;
+            --chat-bubble-text: #1f2937;
+        }
+
+        html[data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-main: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-light: #334155;
+            --diagram-bg: #334155;
+            --diagram-border: #6366f1;
+            --diagram-text: #e0e7ff;
+            --chat-bg: #1e293b;
+            --chat-bubble-bg: #334155;
+            --chat-bubble-text: #f8fafc;
+        }
+
+        /* Applying CSS variables to override specific Tailwind classes dynamically */
+        body, .bg-gray-50 { background-color: var(--bg-body) !important; color: var(--text-main) !important; }
+        aside#sidebar, header, .bg-white { background-color: var(--bg-card) !important; }
+        .text-gray-800, .text-gray-900 { color: var(--text-main) !important; }
+        .text-gray-600, .text-gray-700 { color: var(--text-secondary) !important; }
+        .border-gray-200 { border-color: var(--border-light) !important; }
+        .hover\:bg-gray-100:hover, .hover\:bg-gray-50:hover { background-color: var(--bg-card-hover) !important; }
+        
+        /* Dark Mode fixes for pastel boxes and text colors */
+        html[data-theme="dark"] .bg-slate-50, html[data-theme="dark"] .bg-blue-50, html[data-theme="dark"] .bg-indigo-50,
+        html[data-theme="dark"] .bg-teal-50, html[data-theme="dark"] .bg-purple-50, html[data-theme="dark"] .bg-orange-50,
+        html[data-theme="dark"] .bg-red-50, html[data-theme="dark"] .bg-yellow-50, html[data-theme="dark"] .bg-green-50,
+        html[data-theme="dark"] .bg-indigo-100 {
+            background-color: var(--bg-card-hover) !important;
+            border-color: var(--border-light) !important;
+        }
+        html[data-theme="dark"] .text-blue-800, html[data-theme="dark"] .text-indigo-800, html[data-theme="dark"] .text-teal-800,
+        html[data-theme="dark"] .text-purple-800, html[data-theme="dark"] .text-orange-800, html[data-theme="dark"] .text-red-800,
+        html[data-theme="dark"] .text-yellow-800, html[data-theme="dark"] .text-green-700, html[data-theme="dark"] .text-green-800,
+        html[data-theme="dark"] .text-indigo-950 {
+            color: var(--text-main) !important;
+        }
+
+        /* Custom Elements */
+        .diagram-box {
+            background-color: var(--diagram-bg) !important;
+            border-color: var(--diagram-border) !important;
+            color: var(--diagram-text) !important;
+        }
+        #chatbot-window, #chat-messages, .border-t.bg-white { background-color: var(--chat-bg) !important; }
+        .border-t.bg-white { border-color: var(--border-light) !important; }
+        .chat-bubble-model { background-color: var(--chat-bubble-bg) !important; color: var(--chat-bubble-text) !important; border-color: var(--border-light) !important; }
+        input#chat-input { background-color: var(--bg-body) !important; color: var(--text-main) !important; border-color: var(--border-light) !important; }
+
+        .diagram-box { @apply flex items-center justify-center p-4 border-2 rounded-lg font-semibold text-center shadow-sm; }
+        .diagram-arrow-down { @apply w-0 h-0 border-l-[8px] border-r-[8px] border-t-[12px] border-l-transparent border-r-transparent border-t-gray-400 mx-auto my-2; }
+        .diagram-arrow-right { @apply w-0 h-0 border-t-[8px] border-b-[8px] border-l-[12px] border-t-transparent border-b-transparent border-l-gray-400 my-auto mx-2; }
+        .accordion-content { transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out; max-height: 0; opacity: 0; overflow: hidden; }
+        .accordion-content.active { max-height: 2000px; opacity: 1; }
+        .accordion-icon { transition: transform 0.3s ease; }
+        .accordion-button.active .accordion-icon { transform: rotate(180deg); }
+        .nav-link.active { @apply bg-indigo-50 text-indigo-700 border-r-4 border-indigo-600 font-semibold; }
+        .nav-link { @apply text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-r-4 border-transparent transition-colors duration-200; }
+        /* Scrollbar styling */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen flex overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col h-full z-20 absolute md:relative transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+        <div class="h-16 flex items-center px-6 border-b border-gray-200 justify-between">
+            <h1 class="text-xl font-bold text-indigo-700 tracking-tight">CCS335 Portal</h1>
+            <button onclick="toggleSidebar()" class="md:hidden text-gray-500 hover:text-gray-700 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1">
+                <li><button onclick="showUnit('unit1', 'Unit 1: Cloud Architecture Models')" class="nav-link active w-full text-left px-6 py-3 text-sm flex items-center" id="nav-unit1"><span class="mr-3 text-indigo-500 font-bold bg-indigo-100 rounded-full w-6 h-6 flex items-center justify-center">1</span> Architecture Models</button></li>
+                <li><button onclick="showUnit('unit2', 'Unit 2: Virtualization Basics')" class="nav-link w-full text-left px-6 py-3 text-sm flex items-center" id="nav-unit2"><span class="mr-3 text-gray-500 font-bold bg-gray-100 rounded-full w-6 h-6 flex items-center justify-center">2</span> Virtualization Basics</button></li>
+                <li><button onclick="showUnit('unit3', 'Unit 3: Virtualization Infrastructure & Docker')" class="nav-link w-full text-left px-6 py-3 text-sm flex items-center" id="nav-unit3"><span class="mr-3 text-gray-500 font-bold bg-gray-100 rounded-full w-6 h-6 flex items-center justify-center">3</span> Infrastructure & Docker</button></li>
+                <li><button onclick="showUnit('unit4', 'Unit 4: Cloud Deployment Environment')" class="nav-link w-full text-left px-6 py-3 text-sm flex items-center" id="nav-unit4"><span class="mr-3 text-gray-500 font-bold bg-gray-100 rounded-full w-6 h-6 flex items-center justify-center">4</span> Deployment Env.</button></li>
+                <li><button onclick="showUnit('unit5', 'Unit 5: Cloud Security')" class="nav-link w-full text-left px-6 py-3 text-sm flex items-center" id="nav-unit5"><span class="mr-3 text-gray-500 font-bold bg-gray-100 rounded-full w-6 h-6 flex items-center justify-center">5</span> Cloud Security</button></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative w-full">
+        <!-- Header -->
+        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 lg:px-8 flex-shrink-0 z-10 shadow-sm transition-colors duration-300">
+            <div class="flex items-center">
+                <button onclick="toggleSidebar()" class="md:hidden mr-4 text-gray-500 hover:text-gray-700 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+                <h2 class="text-lg sm:text-xl font-semibold text-gray-800" id="current-unit-title">Unit 1: Cloud Architecture Models</h2>
+            </div>
+            <!-- Dark Mode Toggle Button -->
+            <button onclick="toggleDarkMode()" id="theme-toggle" class="p-2 rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none transition-colors" title="Toggle Dark Mode">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </header>
+
+        <!-- Content Area -->
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-10 scroll-smooth bg-gray-50 relative" id="content-container">
+            
+            <!-- Unit 1 -->
+            <div id="unit1" class="unit-content max-w-5xl mx-auto space-y-6 block pb-20">
+                <p class="text-gray-600 mb-6 text-lg">Introduction to Cloud Architecture, System Models, and Infrastructural Concepts.</p>
+                
+                <!-- Accordion: System Models -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                    <button class="accordion-button w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none bg-gray-50 hover:bg-gray-100 transition-colors" onclick="toggleAccordion('u1-sys', this)">
+                        <span class="font-semibold text-gray-800 text-lg">System Models for Distributed and Cloud Computing</span>
+                        <svg class="accordion-icon w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="u1-sys" class="accordion-content bg-white px-6">
+                        <div class="py-4 space-y-4 text-sm text-gray-700">
+                            <p>Distributed and cloud computing systems are built over large numbers of autonomous computer nodes interconnected by SANs, LANs, or WANs. Massive systems are classified into four groups:</p>
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li><strong>Computer Clusters:</strong> Interconnected stand-alone computers working cooperatively as a single integrated resource (Single-System Image or SSI).</li>
+                                <li><strong>Computing/Data Grids:</strong> Like an electric grid, it couples computers, software, and people across regions. Acts as a virtual platform supporting virtual organizations.</li>
+                                <li><strong>Peer-to-Peer (P2P) Networks:</strong> Every node acts as both client and server. Self-organizing with distributed control. Uses unstructured (flooding) or structured overlay networks.</li>
+                                <li><strong>Internet Clouds:</strong> Centralized data centers moving desktop computing to a service-oriented platform with elastic, virtualized resources provisioned dynamically on demand.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accordion: NIST Architecture -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                    <button class="accordion-button w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none bg-gray-50 hover:bg-gray-100 transition-colors" onclick="toggleAccordion('u1-nist', this)">
+                        <span class="font-semibold text-gray-800 text-lg">NIST Cloud Computing Reference Architecture</span>
+                        <svg class="accordion-icon w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="u1-nist" class="accordion-content bg-white px-6">
+                        <div class="py-4 space-y-4">
+                            <p class="text-sm text-gray-700">The NIST architecture defines 5 major actors participating in cloud computing transactions:</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div class="bg-blue-50 p-3 rounded border border-blue-100"><strong class="text-blue-800">1. Cloud Consumer:</strong> Uses services and maintains a business relationship with providers.</div>
+                                <div class="bg-indigo-50 p-3 rounded border border-indigo-100"><strong class="text-indigo-800">2. Cloud Provider:</strong> Responsible for making a service available to interested parties.</div>
+                                <div class="bg-teal-50 p-3 rounded border border-teal-100"><strong class="text-teal-800">3. Cloud Auditor:</strong> Conducts independent assessment of services, performance, and security.</div>
+                                <div class="bg-purple-50 p-3 rounded border border-purple-100"><strong class="text-purple-800">4. Cloud Broker:</strong> Manages use, performance, and delivery; negotiates relationships. (Arbitrage, Aggregation)</div>
+                                <div class="bg-orange-50 p-3 rounded border border-orange-100"><strong class="text-orange-800">5. Cloud Carrier:</strong> Intermediary providing connectivity and transport.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accordion: Models -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                    <button class="accordion-button w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none bg-gray-50 hover:bg-gray-100 transition-colors" onclick="toggleAccordion('u1-models', this)">
+                        <span class="font-semibold text-gray-800 text-lg">Cloud Deployment & Service Models</span>
+                        <svg class="accordion-icon w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="u1-models" class="accordion-content bg-white px-6">
+                        <div class="py-4 space-y-6 text-sm text-gray-700">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="font-bold text-indigo-600 mb-2 border-b pb-1">Service Models</h4>
+                                    <ul class="list-disc pl-5 space-y-2">
+                                        <li><strong class="text-gray-900">IaaS (Infrastructure as a Service):</strong> Delivers computer infrastructure (networking, storage, servers). Pay-per-use, highly scalable. Example: Amazon EC2.</li>
+                                        <li><strong class="text-gray-900">PaaS (Platform as a Service):</strong> Provides a platform allowing developers to build/run applications without managing infrastructure. Example: Google App Engine.</li>
+                                        <li><strong class="text-gray-900">SaaS (Software as a Service):</strong> Delivers hosted software applications over the internet. Example: Salesforce, Gmail.</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-teal-600 mb-2 border-b pb-1">Deployment Models</h4>
+                                    <ul class="list-disc pl-5 space-y-2">
+                                        <li><strong class="text-gray-900">Public Cloud:</strong> Open to general public. Cost-effective, zero maintenance, highly scalable.</li>
+                                        <li><strong class="text-gray-900">Private Cloud:</strong> Exclusive use by a single organization. Better control, high security, higher cost.</li>
+                                        <li><strong class="text-gray-900">Hybrid Cloud:</strong> Bridges public and private. Flexible but complex to integrate and manage.</li>
+                                        <li><strong class="text-gray-900">Community Cloud:</strong> Shared by specific organizations with mutual concerns (e.g., banks, government).</li>
+                                        <li><strong class="text-gray-900">Multi-Cloud:</strong> Using multiple cloud providers concurrently to prevent lock-in and increase reliability.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accordion: Infra & Challenges -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                    <button class="accordion-button w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none bg-gray-50 hover:bg-gray-100 transition-colors" onclick="toggleAccordion('u1-chal', this)">
+                        <span class="font-semibold text-gray-800 text-lg">Cloud Infrastructure & Design Challenges</span>
+                        <svg class="accordion-icon w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="u1-chal" class="accordion-content bg-white px-6">
+                        <div class="py-4 space-y-4 text-sm text-gray-700">
+                            <h4 class="font-bold text-gray-900 border-b pb-1">Cloud Infrastructure Architecture</h4>
+                            <p>Divided into two main parts: <strong>Frontend</strong> (Client Infrastructure, GUI/Web Browser) and <strong>Backend</strong> (Application, Service, Runtime Cloud, Storage, Infrastructure/Servers, Management, Security).</p>
+                            
+                            <h4 class="font-bold text-rose-600 mt-4 border-b pb-1">Design Challenges</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="bg-rose-50 p-3 rounded border border-rose-100"><strong>1. Service Availability & Data Lock-in:</strong> Risk of single points of failure. Standardizing APIs is necessary to prevent data lock-in and allow multi-cloud usage.</div>
+                                <div class="bg-rose-50 p-3 rounded border border-rose-100"><strong>2. Data Privacy & Security:</strong> Public networks expose systems to attacks (malware, guest hopping, hyperjacking, active/passive attacks).</div>
+                                <div class="bg-rose-50 p-3 rounded border border-rose-100"><strong>3. Unpredictable Performance:</strong> I/O sharing interference among VMs causes bottlenecks. Needs widened links and better OS virtualized interrupts.</div>
+                                <div class="bg-rose-50 p-3 rounded border border-rose-100"><strong>4. Distributed Storage & Bugs:</strong> Growing database needs require scalable SANs. Large-scale distributed bugs are hard to reproduce and debug.</div>
+                                <div class="bg-rose-50 p-3 rounded border border-rose-100"><strong>5. Cloud Scalability & Interoperability:</strong> Handling rapid scale-up/down. OVF (Open Virtualization Format) helps package VMs portably.</div>
+                                <div class="bg-rose-50 p-3 rounded border border-rose-100"><strong>6. Software Licensing:</strong> Traditional commercial licenses don't fit utility computing; requires new pay-per-use structures.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unit 2 -->
+            <div id="unit2" class="unit-content hidden max-w-5xl mx-auto space-y-6 pb-20">
+                <p class="text-gray-600 mb-6 text-lg">Core concepts of Virtual Machines, Hypervisors, and Hardware-level Virtualization.</p>
+                
+                <!-- Accordion: Taxonomy & Levels -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                    <button class="accordion-button w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none bg-gray-50 hover:bg-gray-100" onclick="toggleAccordion('u2-tax', this)">
+                        <span class="font-semibold text-gray-800 text-lg">Taxonomy & Implementation Levels</span>
+                        <svg class="accordion-icon w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="u2-tax" class="accordion-content bg-white px-6">
+                        <div class="py-4 space-y-4 text-sm text-gray-700">
+                            <p><strong>Virtual Machine Taxonomy:</strong></p>
+                            <ul class="list-disc pl-5 mb-4">
+                                <li><strong>Process Virtual Machine:</strong> Runs as a normal application inside a host OS to support a single process (e.g., JVM). Provides platform-independent programming environment.</li>
+                                <li><strong>System Virtual Machine:</strong> Provides a complete system platform supporting the execution of a complete OS (e.g., VirtualBox, VMware).</li>
+                            </ul>
+
+                            <h4 class="font-bold text-gray-900 border-b pb-1">Implementation Levels of Virtualization</h4>
+                            <div class="space-y-2">
+                                <div class="flex items-start"><div class="bg-indigo-100 text-indigo-800 font-bold rounded px-2 py-1 mr-3 text-xs w-20 text-center">App Level</div><div>Virtualizes an application as a VM (Process-level). Examples: JVM, .NET CLR.</div></div>
+                                <div class="flex items-start"><div class="bg-indigo-100 text-indigo-800 font-bold rounded px-2 py-1 mr-3 text-xs w-20 text-center">Library Level</div><div>Virtualization with library interfaces via API hooks. Examples: WINE, vCUDA.</div></div>
+                                <div class="flex items-start"><div class="bg-indigo-100 text-indigo-800 font-bold rounded px-2 py-1 mr-3 text-xs w-20 text-center">OS Level</div><div>Creates isolated containers on a single physical server (Namespace isolation). Examples: Jails, LPAR, Containers.</div></div>
+                                <div class="flex items-start"><div class="bg-indigo-100 text-indigo-800 font-bold rounded px-2 py-1 mr-3 text-xs w-20 text-center">HAL</div><div>Hardware Abstraction Layer. Performed on top of bare hardware to generate virtual hardware environments. Examples: VMware, Xen, Hyper-V.</div></div>
+                                <div class="flex items-start"><div class="bg-indigo-100 text-indigo-800 font-bold rounded px-2 py-1 mr-3 text-xs w-20 text-center">ISA Level</div><div>Instruction Set Architecture emulation via code interpretation/binary translation. Examples: QEMU, Bochs.</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accordion: Hypervisors & Xen -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                    <button class="accordion-button w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none bg-gray-50 hover:bg-gray-100" onclick="toggleAccordion('u2-hyp', this)">
+                        <span class="font-semibold text-gray-800 text-lg">Hypervisor Concepts & Xen Architecture</span>
+                        <svg class="accordion-icon w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="u2-hyp" class="accordion-content bg-white px-6">
+                        <div class="py-4 space-y-4 text-sm text-gray-700">
+                            <p>A <strong>Hypervisor (VMM)</strong> is software/firmware that creates and runs VMs, abstracting the physical hardware.</p>
+                            <ul class="list-disc pl-5 mb-4">
+                                <li><strong>Type 1 (Native/Bare-Metal):</strong> Runs directly on hardware. Replaces host OS. Better performance. (e.g., VMware ESXi, Xen).</li>
+                                <li><strong>Type 2 (Hosted):</strong> Runs as an application on a host OS. Easier setup but higher overhead. (e.g., VirtualBox, VMware Workstation).</li>
+                            </ul>
+
+                            <h4 class="font-bold text-gray-900 border-b pb-1">Xen Architecture</h4>
+                            <p>Xen is a microkernel hypervisor that separates policy from mechanism.</p>
+                            <div class="bg-indigo-50 border border-indigo-100 rounded p-4 flex gap-4 items-center">
+                                <div class="flex-1 space-y-2">
+                                    <p><strong>Domain 0 (Dom0):</strong> The privileged management OS loaded first. Contains device drivers, handles hardware access, and manages policies for other domains.</p>
+                                    <p><strong>Domain U (DomU):</strong> Unprivileged guest domains where user applications run. Uses hypercalls to request I/O and resource allocation from Dom0/Xen.</p>
+                                </div>
+                                <div class="w-1/3 bg-white p-2 rounded border border-indigo-200 text-center text-xs flex flex-col gap-1">
+                                    <div class="flex gap-1">
+                                        <div class="bg-blue-100 p-1 flex-1 rounded border border-blue-300">Dom0</div>
+                                        <div class="bg-green-100 p-1 flex-1 rounded border border-green-300">DomU</div>
+                                        <div class="bg-green-100 p-1 flex-1 rounded border border-green-300">DomU</div>
+                                    </div>
+                                    <div class="bg-purple-100 p-1 rounded border border-purple-300 font-bold">Xen Hypervisor</div>
+                                    <div class="bg-gray-200 p-1 rounded border border-gray-400">Hardware</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accordion: Types & CPU/Mem/IO -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                    <button class="accordion-button w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none bg-gray-50 hover:bg-gray-100" onclick="toggleAccordion('u2-types', this)">
+                        <span class="font-semibold text-gray-800 text-lg">Virtualization Types & CPU/Memory/I/O Virtualization</span>
+                        <svg class="accordion-icon w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="u2-types" class="accordion-content bg-white px-6">
+                        <div class="py-4 space-y-6 text-sm text-gray-700">
+                            <div>
+                                <h4 class="font-bold text-gray-900 border-b pb-1 mb-2">Types of Virtualization</h4>
+                                <ul class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <li class="bg-gray-50 p-3 rounded border"><strong>Full Virtualization:</strong> Complete emulation of underlying hardware using Binary Translation. Unmodified guest OS runs seamlessly.</li>
+                                    <li class="bg-gray-50 p-3 rounded border"><strong>Para-Virtualization:</strong> Exposes a modified software interface. Guest OS is modified to replace privileged instructions with "hypercalls" (e.g., Xen). Better performance but requires OS source code.</li>
+                                    <li class="bg-gray-50 p-3 rounded border"><strong>Hardware-Assisted:</strong> Hardware provides architectural support (Intel VT-x, AMD-V) to trap sensitive instructions without software binary translation overhead.</li>
+                                    <li class="bg-gray-50 p-3 rounded border"><strong>Partial Virtualization:</strong> Partial emulation (e.g., Address Space Virtualization). Many apps run transparently but not all OS features are supported.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h4 class="font-bold text-gray-900 border-b pb-1 mb-2">Hardware Resource Virtualization</h4>
+                                <div class="space-y-4">
+                                    <div class="flex gap-4">
+                                        <div class="w-16 h-16 bg-blue-100 text-blue-700 rounded flex items-center justify-center font-bold flex-shrink-0">CPU</div>
+                                        <div><strong>CPU Virtualization:</strong> To prevent a crash, non-privileged instructions run natively. Privileged and control-sensitive instructions are trapped into the VMM. x86 architecture originally struggled with this until <em>Hardware-Assisted CPU Virtualization</em> (Intel VT-x) introduced the <em>VMX Root Mode (Ring -1)</em>, allowing the hypervisor to run below the OS.</div>
+                                    </div>
+                                    <div class="flex gap-4">
+                                        <div class="w-16 h-16 bg-green-100 text-green-700 rounded flex items-center justify-center font-bold flex-shrink-0">Memory</div>
+                                        <div><strong>Memory Virtualization:</strong> Involves a two-stage mapping. Guest OS maps Virtual Address -> Guest Physical Address. The VMM uses <em>Shadow Page Tables</em> to map Guest Physical Address -> Machine Address. Intel introduced <strong>EPT (Extended Page Tables)</strong> in hardware to accelerate this dual-translation process.</div>
+                                    </div>
+                                    <div class="flex gap-4">
+                                        <div class="w-16 h-16 bg-orange-100 text-orange-700 rounded flex items-center justify-center font-bold flex-shrink-0">I/O</div>
+                                        <div><strong>I/O Virtualization:</strong> Manages routing requests between virtual devices and shared hardware. Three ways: 1) <em>Full Device Emulation</em> (replicates devices in software, slow), 2) <em>Para-virtualization / Split Driver</em> (Frontend in DomU, Backend in Dom0 interacting via shared memory), 3) <em>Direct I/O</em> (VM accesses hardware directly via Intel VT-d).</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unit 3 -->
+            <div id="unit3" class="unit-content hidden max-w-5xl mx-auto space-y-6 pb-20">
+                <p class="text-gray-600 mb-6 text-lg">In-depth look at Virtual Clusters, Advanced Virtualization types, and Docker Containers.</p>
+                
+                <!-- Accordion: Other Virtualization Types -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                    <button class="accordion-button w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none bg-gray-50 hover:bg-gray-100" onclick="toggleAccordion('u3-types', this)">
+                        <span class="font-semibold text-gray-800 text-lg">Desktop, Network, Storage, OS & App Virtualization</span>
+                        <svg class="accordion-icon w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="u3-types" class="accordion-content bg-white px-6">
+                        <div class="py-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+                            <div class="bg-slate-50 p-4 border rounded"><strong>Desktop Virtualization:</strong> Abstracts the desktop environment, storing it remotely on a server/data center and accessing it via client/server approach (e.g., VNC, Citrix XenDesktop). Provides high availability and mobility.</div>
+                            <div class="bg-slate-50 p-4 border rounded"><strong>Network Virtualization:</strong> Aggregates physical networks into a logical network (VLAN) or provides network functionality to an OS partition (Internal NAT/Bridge).</div>
+                            <div class="bg-slate-50 p-4 border rounded"><strong>Storage Virtualization:</strong> Decouples physical organization of hardware from logical representation. Often implemented via Storage Area Networks (SANs).</div>
+                            <div class="bg-slate-50 p-4 border rounded"><strong>OS-Level Virtualization:</strong> The OS kernel allows for multiple isolated user-space instances (Containers/Jails). Efficient for server consolidation (e.g., OpenVZ, Solaris Zones).</div>
+                            <div class="bg-slate-50 p-4 border rounded md:col-span-2"><strong>Application Virtualization:</strong> Allows apps to run in environments that do not natively support them by emulating partial file systems/libraries (e.g., Wine, VMware ThinApp).</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accordion: Virtual Clusters & Migration -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                    <button class="accordion-button w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none bg-gray-50 hover:bg-gray-100" onclick="toggleAccordion('u3-clus', this)">
+                        <span class="font-semibold text-gray-800 text-lg">Virtual Clusters and Resource Management</span>
+                        <svg class="accordion-icon w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="u3-clus" class="accordion-content bg-white px-6">
+                        <div class="py-4 space-y-4 text-sm text-gray-700">
+                            <p>A <strong>Virtual Cluster</strong> comprises virtual servers interconnected by a virtual network, spanning across multiple physical clusters. It allows dynamic deployment, load balancing, and fault tolerance.</p>
+                            
+                            <h4 class="font-bold text-gray-900 border-b pb-1">Live VM Migration</h4>
+                            <p>Moving a running VM from one physical host to another without application downtime. Solves maintenance issues and enables "green computing" by consolidating loads.</p>
+                            
+                            <div class="flex flex-wrap justify-center items-center gap-2 bg-indigo-50 p-4 rounded-lg border border-indigo-100 my-4">
+                                <div class="diagram-box bg-white border-indigo-400 text-indigo-800 text-xs py-2 px-3 shadow-sm">1. Pre-Migration</div>
+                                <div class="text-indigo-400 font-bold">&#8594;</div>
+                                <div class="diagram-box bg-white border-indigo-400 text-indigo-800 text-xs py-2 px-3 shadow-sm">2. Reservation</div>
+                                <div class="text-indigo-400 font-bold">&#8594;</div>
+                                <div class="diagram-box bg-white border-indigo-400 text-indigo-800 text-xs py-2 px-3 shadow-sm">3. Pre-Copy</div>
+                                <div class="text-indigo-400 font-bold">&#8594;</div>
+                                <div class="diagram-box bg-white border-indigo-400 text-indigo-800 text-xs py-2 px-3 shadow-sm">4. Store & Copy</div>
+                                <div class="text-indigo-400 font-bold">&#8594;</div>
+                                <div class="diagram-box bg-white border-indigo-400 text-indigo-800 text-xs py-2 px-3 shadow-sm">5. Commit</div>
+                                <div class="text-indigo-400 font-bold">&#8594;</div>
+                                <div class="diagram-box bg-white border-indigo-400 text-indigo-800 text-xs py-2 px-3 shadow-sm">6. Activation</div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                                <div class="bg-white p-3 rounded shadow-sm border border-gray-200"><strong>Memory Migration:</strong> Moving the memory instance. ISR (Internet Suspend-Resume) uses temporal locality to cache changed files.</div>
+                                <div class="bg-white p-3 rounded shadow-sm border border-gray-200"><strong>File System Migration:</strong> Global file systems (NAS/SAN) avoid copying huge disk contents across the network during migration.</div>
+                                <div class="bg-white p-3 rounded shadow-sm border border-gray-200"><strong>Network Migration:</strong> Virtual IP and MAC addresses move with the VM to maintain open network connections without redirection mechanisms.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accordion: Docker -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                    <button class="accordion-button w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none bg-gray-50 hover:bg-gray-100" onclick="toggleAccordion('u3-doc', this)">
+                        <span class="font-semibold text-gray-800 text-lg">Containers vs VMs & Docker Ecosystem</span>
+                        <svg class="accordion-icon w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="u3-doc" class="accordion-content bg-white px-6">
+                        <div class="py-4 space-y-4 text-sm text-gray-700">
+                            
+                            <div class="flex flex-col md:flex-row gap-6 mb-6">
+                                <div class="flex-1 bg-rose-50 p-4 rounded border border-rose-200">
+                                    <h5 class="font-bold text-rose-800 mb-2">Virtual Machines</h5>
+                                    <p>Virtualizes the entire hardware stack via a hypervisor. Each VM includes a full Guest OS. Provides strict isolation but is resource-heavy, large in size, and slow to boot.</p>
+                                </div>
+                                <div class="flex-1 bg-teal-50 p-4 rounded border border-teal-200">
+                                    <h5 class="font-bold text-teal-800 mb-2">Containers</h5>
+                                    <p>OS-level virtualization sharing a single host kernel. Contains only app code and dependencies. Extremely lightweight, fast to iterate, and highly portable, but shares vulnerability risks if kernel is breached.</p>
+                                </div>
+                            </div>
+
+                            <h4 class="font-bold text-gray-900 border-b pb-1">Docker Components</h4>
+                            <ul class="list-disc pl-5 space-y-2 mb-4">
+                                <li><strong>Docker Engine:</strong> The core software, comprising a Daemon (background server), REST API, and CLI client.</li>
+                                <li><strong>Docker Client:</strong> The interface (`docker build`, `docker pull`, `docker run`) used by developers to communicate with the Daemon.</li>
+                                <li><strong>Docker Host:</strong> The machine executing the Daemon and hosting the containers/images.</li>
+                                <li><strong>Docker Images:</strong> Read-only file templates with multiple layers of instructions used to build containers.</li>
+                                <li><strong>Docker Container:</strong> A lightweight, isolated runtime environment created from an image.</li>
+                                <li><strong>Docker Registry (Hub):</strong> A cloud-based repository for storing, sharing, and discovering public or private Docker Images.</li>
+                            </ul>
+
+                            <h4 class="font-bold text-gray-900 border-b pb-1">Docker Storage & Networking</h4>
+                            <p><strong>Storage:</strong> Data Volumes (host directories), Volume Containers (sharing states between containers), Directory Mounts.</p>
+                            <p><strong>Networking:</strong> Bridge (default isolation), Host (shares host network), Overlay (Swarm multi-host), Macvlan (assigns MAC to container), None.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unit 4 -->
+            <div id="unit4" class="unit-content hidden max-w-5xl mx-auto space-y-6 pb-20">
+                <p class="text-gray-600 mb-6 text-lg">Cloud Software Environments: GAE, AWS, Azure, Eucalyptus, and OpenStack.</p>
+                
+                <!-- Accordion: General Env & Public Clouds -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                    <button class="accordion-button w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none bg-gray-50 hover:bg-gray-100" onclick="toggleAccordion('u4-pub', this)">
+                        <span class="font-semibold text-gray-800 text-lg">Cloud Software Env, GAE, AWS, Azure</span>
+                        <svg class="accordion-icon w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="u4-pub" class="accordion-content bg-white px-6">
+                        <div class="py-4 space-y-6 text-sm text-gray-700">
+                            <div>
+                                <p><strong>Computing Environments:</strong> Mainframe (robust, critical tasks), Client-Server, Cloud Computing, Mobile Computing, Grid Computing, Embedded Systems.</p>
+                            </div>
+
+                            <!-- GAE -->
+                            <div class="border-l-4 border-red-500 pl-4 bg-red-50 p-3 rounded">
+                                <h4 class="font-bold text-red-800 text-base mb-2">Google App Engine (GAE)</h4>
+                                <p class="mb-2">A PaaS offering built on Google's search engine data center expertise. Supports scalable web apps in Python/Java. Apps include Gmail, Google Docs, Google Earth.</p>
+                                <ul class="list-disc pl-5 space-y-1">
+                                    <li><strong>Modules:</strong> Datastore, App runtime environment, SDK, Admin console, Web service infra.</li>
+                                    <li><strong>GFS (Google File System):</strong> Stores massive data redundantly using 64MB blocks.</li>
+                                    <li><strong>MapReduce:</strong> Framework for distributed application programming.</li>
+                                    <li><strong>BigTable:</strong> Distributed, multi-level map NOSQL storage for structured data.</li>
+                                    <li><strong>Chubby:</strong> Distributed coarse-grained lock service.</li>
+                                </ul>
+                            </div>
+                            
+                            <!-- AWS -->
+                            <div class="border-l-4 border-yellow-500 pl-4 bg-yellow-50 p-3 rounded">
+                                <h4 class="font-bold text-yellow-800 text-base mb-2">Amazon Web Services (AWS)</h4>
+                                <p class="mb-2">Provides IaaS, PaaS, and SaaS using a massive global infrastructure (Regions, Availability Zones, Edge Locations). Pay-as-you-go.</p>
+                                <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 list-disc pl-5">
+                                    <li><strong>EC2 (Elastic Compute Cloud):</strong> Secure, resizable virtual VMs (IaaS).</li>
+                                    <li><strong>Lambda:</strong> Serverless, event-driven compute.</li>
+                                    <li><strong>Elastic Beanstalk:</strong> PaaS for deploying web apps.</li>
+                                    <li><strong>VPC:</strong> Virtual Private Cloud for isolated networking.</li>
+                                    <li><strong>Route 53:</strong> Scalable DNS.</li>
+                                    <li><strong>S3:</strong> Object storage with 99.999999999% durability.</li>
+                                    <li><strong>Glacier:</strong> Long-term cold data archiving.</li>
+                                    <li><strong>RDS & DynamoDB:</strong> Relational and NoSQL managed databases.</li>
+                                </ul>
+                            </div>
+
+                            <!-- Azure -->
+                            <div class="border-l-4 border-blue-500 pl-4 bg-blue-50 p-3 rounded">
+                                <h4 class="font-bold text-blue-800 text-base mb-2">Microsoft Azure</h4>
+                                <p>Cost-effective cloud platform providing Compute (VMs, Fabric, Batch), Networking (VNet, App Gateway, Express Route), Storage (Blob, Queue, File, Data Lake), and Web+Mobile services. Evolved from Windows Azure (2008) to a robust enterprise cloud.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accordion: Open Source Platforms -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                    <button class="accordion-button w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none bg-gray-50 hover:bg-gray-100" onclick="toggleAccordion('u4-open', this)">
+                        <span class="font-semibold text-gray-800 text-lg">Open-Source Platforms: Eucalyptus & OpenStack</span>
+                        <svg class="accordion-icon w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="u4-open" class="accordion-content bg-white px-6">
+                        <div class="py-4 space-y-6 text-sm text-gray-700">
+                            
+                            <!-- Eucalyptus -->
+                            <div class="border border-green-200 rounded-lg p-4 bg-white shadow-sm">
+                                <h4 class="font-bold text-green-700 text-base mb-2 border-b pb-1">Eucalyptus</h4>
+                                <p class="mb-3">An open-source Linux-based IaaS platform highly compatible with AWS EC2 and S3 APIs, ideal for hybrid clouds.</p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <ul class="list-disc pl-5 space-y-1">
+                                        <li><strong>Node Controller (NC):</strong> Manages instance lifecycle, talks to OS/hypervisor.</li>
+                                        <li><strong>Cluster Controller (CC):</strong> Middleman managing multiple NCs.</li>
+                                        <li><strong>Cloud Controller (CLC):</strong> Front-end web interface/API.</li>
+                                        <li><strong>Walrus (Storage Controller):</strong> Handles block storage and snapshots (like S3).</li>
+                                    </ul>
+                                    <div class="bg-green-50 p-2 rounded border border-green-100">
+                                        <p class="font-bold mb-1">Network Modes:</p>
+                                        <ul class="list-circle pl-5 text-xs space-y-1">
+                                            <li><strong>Static:</strong> Allocates IP address mapped to MAC.</li>
+                                            <li><strong>System:</strong> Assigns MAC and bridges to physical network.</li>
+                                            <li><strong>Managed:</strong> VLAN isolated security groups.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- OpenStack -->
+                            <div class="border border-red-200 rounded-lg p-4 bg-white shadow-sm">
+                                <h4 class="font-bold text-red-700 text-base mb-2 border-b pb-1">OpenStack</h4>
+                                <p class="mb-3">Open-source IaaS cloud platform originally created by Rackspace and NASA. Comprises separately installed key services interacting via APIs and an AMQP message broker.</p>
+                                
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-center">
+                                    <div class="diagram-box border-rose-400 bg-rose-50 flex-col py-3"><span class="font-bold text-rose-800">Nova</span><span class="text-xs">Compute (hypervisor mgmt)</span></div>
+                                    <div class="diagram-box border-emerald-400 bg-emerald-50 flex-col py-3"><span class="font-bold text-emerald-800">Neutron</span><span class="text-xs">Networking (VLANs, IPs)</span></div>
+                                    <div class="diagram-box border-indigo-400 bg-indigo-50 flex-col py-3"><span class="font-bold text-indigo-800">Swift</span><span class="text-xs">Object Storage</span></div>
+                                    <div class="diagram-box border-amber-400 bg-amber-50 flex-col py-3"><span class="font-bold text-amber-800">Cinder</span><span class="text-xs">Block Storage (disks)</span></div>
+                                    <div class="diagram-box border-blue-400 bg-blue-50 flex-col py-3"><span class="font-bold text-blue-800">Keystone</span><span class="text-xs">Identity (Authentication)</span></div>
+                                    <div class="diagram-box border-purple-400 bg-purple-50 flex-col py-3"><span class="font-bold text-purple-800">Glance</span><span class="text-xs">Image Registry</span></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unit 5 -->
+            <div id="unit5" class="unit-content hidden max-w-5xl mx-auto space-y-6 pb-20">
+                <p class="text-gray-600 mb-6 text-lg">Cloud Security Threats, Data Protection, and Identity & Access Management (IAM).</p>
+                
+                <!-- Accordion: Security Threats & Data -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                    <button class="accordion-button w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none bg-gray-50 hover:bg-gray-100" onclick="toggleAccordion('u5-att', this)">
+                        <span class="font-semibold text-gray-800 text-lg">Virtualization Attacks & Cloud Data Security</span>
+                        <svg class="accordion-icon w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="u5-att" class="accordion-content bg-white px-6">
+                        <div class="py-4 space-y-6 text-sm text-gray-700">
+                            
+                            <div class="bg-red-50 border border-red-200 p-4 rounded-lg">
+                                <h4 class="font-bold text-red-800 mb-2 border-b border-red-200 pb-1">Virtualization System-Specific Attacks</h4>
+                                <ul class="list-disc pl-5 space-y-2">
+                                    <li><strong>Guest Hopping:</strong> An attacker penetrates one VM and jumps to another hosted on the same hardware. Mitigation: High Assurance Platforms (HAP) and forensics.</li>
+                                    <li><strong>Hyperjacking:</strong> The attacker compromises and replaces the legitimate hypervisor with a rogue one, taking total control of the VM host without the guest OS's knowledge. (Like a rootkit).</li>
+                                    <li><strong>VM Migration Attack:</strong> Exploits the live migration process. The attacker alters the state of memory being transferred over the data/control/migration plane.</li>
+                                    <li><strong>Cross-VM Cache Side Channel:</strong> Exploits shared cache memory between VMs on the same hardware to extract cryptographic keys.</li>
+                                </ul>
+                            </div>
+                            
+                            <div>
+                                <h4 class="font-bold text-blue-800 mb-2 border-b pb-1">Data Security and Storage</h4>
+                                <p class="mb-3">Protecting data stored (at rest) or moving (in motion). Core principles include Confidentiality, Integrity, Accountability, and Availability (CIA Triad).</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <ul class="list-disc pl-5 space-y-1">
+                                        <li><strong>Components:</strong> Visibility, Exposure Mgmt, Prevention Controls, Detection, Response.</li>
+                                        <li><strong>Challenges:</strong> Lack of visibility, less control on 3rd party infra, shared responsibility confusion, compliance demands, distributed storage sovereignty.</li>
+                                    </ul>
+                                    <ul class="list-disc pl-5 space-y-1">
+                                        <li><strong>Benefits:</strong> Easy backups, cloud data compliance (DLP tools), advanced encryption at rest/transit, lower TCO, AI-based incident response.</li>
+                                        <li><strong>Storage Types:</strong> Object storage, File storage, and Block storage.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accordion: IAM -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                    <button class="accordion-button w-full px-6 py-4 text-left flex justify-between items-center focus:outline-none bg-gray-50 hover:bg-gray-100" onclick="toggleAccordion('u5-iam', this)">
+                        <span class="font-semibold text-gray-800 text-lg">Identity and Access Management (IAM)</span>
+                        <svg class="accordion-icon w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div id="u5-iam" class="accordion-content bg-white px-6">
+                        <div class="py-4 space-y-6 text-sm text-gray-700">
+                            
+                            <p><strong>IAM</strong> ensures that the right people/roles (identities) can access the tools they need. Uses "Principals" (human or workload) assigned with credentials.</p>
+                            <p><strong>Challenges:</strong> High turnover/lifecycle management, diverse populations (employees, partners), disparate directories creating complex webs, lack of centralized view, and compliance visibility.</p>
+
+                            <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 overflow-x-auto">
+                                <h5 class="font-bold text-slate-800 mb-4 text-center border-b pb-2">IAM Core Architecture Modules</h5>
+                                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                    <div class="bg-white p-3 border rounded shadow-sm"><strong>User Mgmt:</strong> Identity life cycles, onboarding/deprovisioning.</div>
+                                    <div class="bg-white p-3 border rounded shadow-sm"><strong>Authentication Mgmt:</strong> Verifying *who* the user is (credentials/passwords).</div>
+                                    <div class="bg-white p-3 border rounded shadow-sm"><strong>Authorization Mgmt:</strong> Entitlements; defining *what* services they can access.</div>
+                                    <div class="bg-white p-3 border rounded shadow-sm"><strong>Access Mgmt:</strong> Responding to requests to access resources based on policies.</div>
+                                    <div class="bg-white p-3 border rounded shadow-sm"><strong>Data Mgmt & Provisioning:</strong> Pushing authorizations to IT resources automatically.</div>
+                                    <div class="bg-white p-3 border rounded shadow-sm"><strong>Monitoring & Auditing:</strong> Tracking access logs for compliance reporting.</div>
+                                </div>
+                            </div>
+
+                            <div class="border-t pt-4">
+                                <h4 class="font-bold text-gray-900 mb-2">IAM Practices in the Cloud (Federation & SSO)</h4>
+                                <ul class="list-disc pl-5 space-y-3">
+                                    <li><strong>Enterprise Identity Provider (IdP):</strong> Organization federates identities within a trusted circle of CSP domains using an internal IdP. <em>Pros:</em> Leverages existing IAM, consistent policies. <em>Cons:</em> Inefficiencies managing non-employees (customers).</li>
+                                    <li><strong>Identity Management-as-a-Service (IDaaS):</strong> Outsource federated identity to a third party (e.g., Ping Identity) acting as a multiprotocol federation gateway (SAML 1.1 vs 2.0). <em>Pros:</em> Hides integration complexity. <em>Cons:</em> Less visibility into architecture, relies on provider SLA.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- AI Tutor Widget -->
+    <!-- Floating Action Button -->
+    <button id="chatbot-fab" onclick="toggleChat()" class="fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-2xl transition-transform hover:scale-110 z-50 focus:outline-none ring-4 ring-indigo-100 flex items-center justify-center">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+    </button>
+
+    <!-- Chat Window -->
+    <div id="chatbot-window" class="fixed bottom-24 right-6 w-[90vw] sm:w-96 h-[32rem] bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] flex flex-col z-50 hidden border border-gray-200 overflow-hidden transition-all duration-300 transform scale-95 opacity-0 origin-bottom-right">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-indigo-600 to-indigo-800 p-4 text-white flex justify-between items-center shadow-md z-10">
+            <div class="flex items-center gap-2">
+                <svg class="w-6 h-6 text-indigo-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                <div>
+                    <h3 class="font-bold leading-tight">Cloud AI Tutor</h3>
+                    <span class="text-xs text-indigo-200 block">Expert TA powered by Gemini</span>
+                </div>
+            </div>
+            <button onclick="toggleChat()" class="text-indigo-100 hover:text-white hover:bg-indigo-500/50 p-1 rounded-full focus:outline-none transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <!-- Body -->
+        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto flex flex-col gap-4 bg-[#f8fafc]">
+            <!-- Welcome Message -->
+            <div class="flex items-start gap-2 animate-fade-in">
+                <div class="bg-indigo-100 text-indigo-950 p-3.5 rounded-2xl rounded-tl-none text-sm max-w-[85%] shadow-sm leading-relaxed border border-indigo-200">
+                    Hello! 👋 I'm your Cloud Computing AI Tutor. Ask me anything about Virtualization, AWS, Docker, or any concepts from CCS335. Let's learn together!
+                </div>
+            </div>
+        </div>
+        <!-- Input Area -->
+        <div class="p-3 border-t border-gray-200 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10">
+            <form id="chat-form" class="flex gap-2" onsubmit="handleSend(event)">
+                <input type="text" id="chat-input" placeholder="Ask a question..." class="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-shadow bg-gray-50 hover:bg-white" autocomplete="off">
+                <button type="submit" class="bg-indigo-600 text-white rounded-full w-10 h-10 flex flex-shrink-0 items-center justify-center hover:bg-indigo-700 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed shadow-md" id="chat-submitBtn">
+                    <svg class="w-4 h-4 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        /* Add slight animations for chat elements */
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                        }
-                    }
+        // Store titles for dynamic header updates
+        const titles = {
+            'unit1': 'Unit 1: Cloud Architecture Models',
+            'unit2': 'Unit 2: Virtualization Basics',
+            'unit3': 'Unit 3: Virtualization Infrastructure & Docker',
+            'unit4': 'Unit 4: Cloud Deployment Environment',
+            'unit5': 'Unit 5: Cloud Security'
+        };
+
+        // Handle Unit Switching
+        function showUnit(unitId, title) {
+            // Hide all content
+            document.querySelectorAll('.unit-content').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            
+            // Show selected content
+            const activeContent = document.getElementById(unitId);
+            activeContent.classList.remove('hidden');
+            activeContent.classList.add('block');
+            
+            // Update Header
+            document.getElementById('current-unit-title').innerText = title;
+
+            // Reset navigation styles
+            document.querySelectorAll('.nav-link').forEach(el => {
+                el.classList.remove('active');
+                const badge = el.querySelector('span');
+                badge.classList.remove('text-indigo-500', 'bg-indigo-100');
+                badge.classList.add('text-gray-500', 'bg-gray-100');
+            });
+
+            // Set active navigation styles
+            const activeNav = document.getElementById('nav-' + unitId);
+            activeNav.classList.add('active');
+            const activeBadge = activeNav.querySelector('span');
+            activeBadge.classList.remove('text-gray-500', 'bg-gray-100');
+            activeBadge.classList.add('text-indigo-500', 'bg-indigo-100');
+
+            // Close sidebar on mobile
+            if(window.innerWidth < 768) {
+                toggleSidebar();
+            }
+
+            // Scroll to top of content
+            document.getElementById('content-container').scrollTop = 0;
+        }
+
+        // Handle Sidebar Toggle on Mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-full');
+        }
+
+        // Handle Accordion Toggle
+        function toggleAccordion(contentId, btn) {
+            const content = document.getElementById(contentId);
+            btn.classList.toggle('active');
+            content.classList.toggle('active');
+        }
+
+        // Initialize first accordions open for better UX
+        window.onload = () => {
+            initTheme(); // Initialize dark mode on load
+            ['u1-sys', 'u2-tax', 'u3-types', 'u4-pub', 'u5-att'].forEach(id => {
+                const content = document.getElementById(id);
+                if(content) {
+                    content.classList.add('active');
+                    content.previousElementSibling.classList.add('active');
                 }
+            });
+        };
+
+        // --- DARK MODE LOGIC ---
+        function toggleDarkMode() {
+            const htmlElement = document.documentElement;
+            const isDark = htmlElement.getAttribute('data-theme') === 'dark';
+            const newTheme = isDark ? 'light' : 'dark';
+            htmlElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const iconContainer = document.getElementById('theme-toggle');
+            if(!iconContainer) return;
+            if(theme === 'dark') {
+                iconContainer.innerHTML = `<svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>`;
+            } else {
+                iconContainer.innerHTML = `<svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>`;
+            }
+        }
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+            updateThemeIcon(theme);
+        }
+
+        // --- AI TUTOR CHAT LOGIC ---
+        let isChatOpen = false;
+        
+        function toggleChat() {
+            const chatWindow = document.getElementById('chatbot-window');
+            isChatOpen = !isChatOpen;
+            
+            if (isChatOpen) {
+                chatWindow.classList.remove('hidden');
+                // Allow display to register before triggering opacity/scale for animation
+                requestAnimationFrame(() => {
+                    chatWindow.classList.remove('opacity-0', 'scale-95');
+                    chatWindow.classList.add('opacity-100', 'scale-100');
+                });
+                document.getElementById('chat-input').focus();
+            } else {
+                chatWindow.classList.remove('opacity-100', 'scale-100');
+                chatWindow.classList.add('opacity-0', 'scale-95');
+                // Wait for animation to finish before hiding
+                setTimeout(() => chatWindow.classList.add('hidden'), 300);
+            }
+        }
+
+        const apiKey = ""; 
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+        
+        // System instruction enforcing the teaching assistant persona
+        const systemPrompt = `You are an expert Cloud Computing teaching assistant for the CCS335 course. 
+Your goal is to help students truly understand the material.
+Rules:
+1. Explain complex concepts (like Hypervisors, Live Migration, Docker, NIST models, etc.) using simple, beginner-friendly analogies.
+2. Provide concise, clear, and well-structured answers using markdown.
+3. Keep the tone encouraging, scholarly, and supportive.
+4. Occasionally suggest short active learning exercises or thought experiments to test the user's understanding at the end of your response.`;
+        
+        let chatContext = [];
+
+        async function handleSend(e) {
+            e.preventDefault();
+            const inputField = document.getElementById('chat-input');
+            const message = inputField.value.trim();
+            if (!message) return;
+
+            inputField.value = '';
+            appendMessage('user', message);
+            setLoading(true);
+
+            // Add to context
+            chatContext.push({ role: "user", parts: [{ text: message }] });
+
+            const payload = {
+                contents: chatContext,
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            // Implement a simple fetch with retry wrapper if necessary, but standard fetch handles normal cases.
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                let aiMessage = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (aiMessage) {
+                    chatContext.push({ role: "model", parts: [{ text: aiMessage }] });
+                    appendMessage('model', aiMessage);
+                } else {
+                    throw new Error("Invalid response structure");
+                }
+            } catch (err) {
+                console.error("Chat API Error:", err);
+                appendMessage('model', "I'm having a little trouble connecting right now. Please check your network or try again in a moment.");
+                chatContext.pop(); // Remove the user message from context if it failed to process
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function appendMessage(role, text) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const isUser = role === 'user';
+            
+            // Format basic markdown (bold, code blocks, lists)
+            let formattedText = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/`(.*?)`/g, '<code class="bg-white/50 text-indigo-800 px-1 py-0.5 rounded font-mono text-xs border border-indigo-200/50">$1</code>')
+                .replace(/\n/g, '<br>');
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex items-start gap-2 animate-fade-in ${isUser ? 'flex-row-reverse' : ''}`;
+            
+            const bubbleClasses = isUser 
+                ? 'bg-indigo-600 text-white rounded-tr-none border border-indigo-700' 
+                : 'bg-white text-gray-800 rounded-tl-none border border-gray-200 chat-bubble-model';
+            
+            msgDiv.innerHTML = `
+                <div class="${bubbleClasses} p-3.5 rounded-2xl text-sm max-w-[85%] shadow-sm leading-relaxed">
+                    ${formattedText}
+                </div>
+            `;
+            
+            messagesContainer.appendChild(msgDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function setLoading(isLoading) {
+            const btn = document.getElementById('chat-submitBtn');
+            const input = document.getElementById('chat-input');
+            btn.disabled = isLoading;
+            input.disabled = isLoading;
+            
+            if (isLoading) {
+                const messagesContainer = document.getElementById('chat-messages');
+                const loadingDiv = document.createElement('div');
+                loadingDiv.id = 'chat-loading';
+                loadingDiv.className = 'flex items-start gap-2 animate-fade-in';
+                loadingDiv.innerHTML = `
+                    <div class="bg-white border border-gray-200 p-4 rounded-2xl rounded-tl-none shadow-sm flex items-center justify-center gap-1.5 h-[44px]">
+                        <span class="animate-bounce inline-block w-2 h-2 bg-indigo-400 rounded-full"></span>
+                        <span class="animate-bounce inline-block w-2 h-2 bg-indigo-400 rounded-full" style="animation-delay: 0.15s"></span>
+                        <span class="animate-bounce inline-block w-2 h-2 bg-indigo-400 rounded-full" style="animation-delay: 0.3s"></span>
+                    </div>
+                `;
+                messagesContainer.appendChild(loadingDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            } else {
+                const loadingDiv = document.getElementById('chat-loading');
+                if (loadingDiv) loadingDiv.remove();
+                input.focus();
             }
         }
     </script>
-    <style>
-        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
-        .course-card:hover .course-img { transform: scale(1.05); }
-    </style>
-</head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased flex flex-col min-h-screen">
-    
-    <!-- Navigation Header -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
-            <div class="font-bold text-2xl text-blue-600 flex items-center">
-                <i class="fas fa-graduation-cap mr-2"></i> RVSCE - IT - LearnPortal
-            </div>
-            <nav class="hidden md:flex space-x-8">
-               
-            </nav>
-           
-        </div>
-    </header>
-
-    <!-- Hero Section -->
-    <main class="flex-grow">
-       
-        <!-- Benefits Section -->
-        <section id="benefits" class="bg-gray-50 py-16 border-t border-gray-100">
-            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl font-bold text-gray-900">Student Portal</h2>
-                    <div class="w-16 h-1 bg-blue-600 mx-auto mt-4 rounded"></div>
-                </div>
-                <div class="grid md:grid-cols-3 gap-8">
-                    <div class="bg-white p-8 rounded-xl shadow-sm text-center border border-gray-100 hover:shadow-md transition">
-                        <div class="text-blue-600 text-4xl mb-4"><i class="fas fa-laptop-house"></i></div>
-                        <h3 class="text-xl font-semibold mb-3 text-gray-900">II Year </h3>
-                        <p class="text-gray-600">2025 - 2029</p>
-                        <a href="https://geetharanisundar.github.io/RVSCE_IT_A_2025-2029/" target="_blank" class="text-blue-600 font-semibold hover:text-blue-800 transition">A section  &rarr;</a>
-                        <a href="https://geetharanisundarrvs.github.io/RVSCE_IT_B_2025-2029/" target="_blank" class="text-blue-600 font-semibold hover:text-blue-800 transition">B section  &rarr;</a>
-                    </div>
-                    <div class="bg-white p-8 rounded-xl shadow-sm text-center border border-gray-100 hover:shadow-md transition">
-                        <div class="text-blue-600 text-4xl mb-4"><i class="fas fa-user-graduate"></i></div>
-                        <h3 class="text-xl font-semibold mb-3 text-gray-900">III Year</h3>
-                        <p class="text-gray-600">2024 - 2028</p>
-                        <a href="#" class="text-blue-600 font-semibold hover:text-blue-800 transition">View  &rarr;</a>
-                    </div>
-                    <div class="bg-white p-8 rounded-xl shadow-sm text-center border border-gray-100 hover:shadow-md transition">
-                        <div class="text-blue-600 text-4xl mb-4"><i class="fas fa-certificate"></i></div>
-                        <h3 class="text-xl font-semibold mb-3 text-gray-900">IV Year</h3>
-                        <p class="text-gray-600">2023 - 2027</p>
-                        <a href="#" class="text-blue-600 font-semibold hover:text-blue-800 transition">View  &rarr;</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Featured Courses Section -->
-        <section id="courses" class="bg-white py-16">
-            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl font-bold text-gray-900">Subjects</h2>
-                    <div class="w-16 h-1 bg-blue-600 mx-auto mt-4 rounded"></div>
-                </div>
-                <div class="grid md:grid-cols-3 gap-8">
-                    <!-- Course Card 1 -->
-                    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition duration-300">
-                       
-                        <div class="p-6">
-                            <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">CS25C01 - I SEMESTER</span>
-                            <h3 class="text-xl font-bold mt-2 mb-2 text-gray-900">Computer Programming: C </h3>
-                            <p class="text-gray-600 mb-4 text-sm">To equip engineering students with the foundational knowledge and practical 
-skills in ‘C’ programming to analyse and solve computational problems effectively.</p>
-                            <div class="flex justify-between items-center mt-4">
-                               
-                                <a href="https://geetharanisundarrvs.github.io/cs25c01/" target="_blank" class="text-blue-600 font-semibold hover:text-blue-800 transition">View  &rarr;</a>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Course Card 2 -->
-                    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition duration-300">
-                       
-                        <div class="p-6">
-                            <span class="text-xs font-bold text-purple-600 uppercase tracking-wider">IT25202 - II SEMESTER</span>
-                            <h3 class="text-xl font-bold mt-2 mb-2 text-gray-900">Digital Principles and System Design</h3>
-                            <p class="text-gray-600 mb-4 text-sm">To understand the basics of number systems and Boolean algebra.  </p>
-                            <div class="flex justify-between items-center mt-4">
-                                
-                                <a href="https://geetharanisundarrvs.github.io/IT25202/" target="_blank" "text-blue-600 font-semibold hover:text-blue-800 transition">View  &rarr;</a>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Course Card 3 -->
-                    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition duration-300">
-                       
-                        <div class="p-6">
-                            <span class="text-xs font-bold text-green-600 uppercase tracking-wider">IT25201 - II SEMESTER</span>
-                            <h3 class="text-xl font-bold mt-2 mb-2 text-gray-900">Foundations of Data Science Using Python </h3>
-                            <p class="text-gray-600 mb-4 text-sm">To equip students with a strong foundational understanding of data science 
-concepts. </p>
-                            <div class="flex justify-between items-center mt-4">
-                               
-                                <a href="#" class="text-blue-600 font-semibold hover:text-blue-800 transition">View  &rarr;</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-         <section id="courses" class="bg-white py-16">
-            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                
-                <div class="grid md:grid-cols-3 gap-8">
-                    <!-- Course Card 1 -->
-                    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition duration-300">
-                       
-                        <div class="p-6">
-                            <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">CS25C07 - III SEMESTER</span>
-                            <h3 class="text-xl font-bold mt-2 mb-2 text-gray-900">Object Oriented Programming</h3>
-                            <p class="text-gray-600 mb-4 text-sm">To impart the principles of object-oriented programming and their advantages over 
-procedural programming.</p>
-                            <div class="flex justify-between items-center mt-4">
-                               
-                                <a href="https://geetharanisundar.github.io/oops_cpp_learning_portal/" target="_blank" class="text-blue-600 font-semibold hover:text-blue-800 transition">View  &rarr;</a>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Course Card 2 -->
-                    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition duration-300">
-                       
-                        <div class="p-6">
-                            <span class="text-xs font-bold text-purple-600 uppercase tracking-wider">CS25C07 - III SEMESTER</span>
-                            <h3 class="text-xl font-bold mt-2 mb-2 text-gray-900">Object Oriented Programming Lab</h3>
-                            <p class="text-gray-600 mb-4 text-sm">To develop problem-solving skills by creating real-world applications using OOP 
-features. </p>
-                            <div class="flex justify-between items-center mt-4">
-                                
-                                <a href="https://geetharanisundar.github.io/oops_cpp_manual/" target="_blank" "text-blue-600 font-semibold hover:text-blue-800 transition">View  &rarr;</a>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Course Card 3 -->
-                    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition duration-300">
-                       
-                        <div class="p-6">
-                            <span class="text-xs font-bold text-green-600 uppercase tracking-wider">CCS335 - V SEMESTER</span>
-                            <h3 class="text-xl font-bold mt-2 mb-2 text-gray-900">Cloud Computing</h3>
-                            <p class="text-gray-600 mb-4 text-sm">To understand the principles of cloud architecture, models and infrastructure.</p>
-                            <div class="flex justify-between items-center mt-4">
-                               
-                                <a href="#" class="text-blue-600 font-semibold hover:text-blue-800 transition">View  &rarr;</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Simple Footer -->
-    <footer class="bg-gray-900 text-white py-10">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
-            <div class="text-2xl font-bold text-blue-500 mb-4 md:mb-0 flex items-center">
-                <i class="fas fa-graduation-cap mr-2"></i> RVSCE - IT - LearnPortal
-            </div>
-            <p class="text-gray-400 text-sm mb-4 md:mb-0">&copy; 2026  RVSCE - IT - LearnPortal. All rights reserved.</p>
-            <div class="flex space-x-6">
-               
-            </div>
-        </div>
-    </footer>
 </body>
 </html>
